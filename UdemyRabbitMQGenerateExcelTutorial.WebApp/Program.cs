@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
+using System.Configuration;
 using UdemyRabbitMQGenerateExcelTutorial.WebApp.Models;
+using UdemyRabbitMQGenerateExcelTutorial.WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +14,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
 });
+
+
+builder.Services.AddSingleton(sp => new ConnectionFactory()
+{
+    Uri = new Uri(builder.Configuration.GetConnectionString("RabbbitMQUrl")),
+    DispatchConsumersAsync = true
+});
+
+builder.Services.AddSingleton<RabbitMQClientService>();
+
+
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
