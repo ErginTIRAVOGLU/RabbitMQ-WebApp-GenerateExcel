@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using RabbitMQGenerateExcelTutorial.FileCreateWorkerService;
+using RabbitMQGenerateExcelTutorial.FileCreateWorkerService.Models;
 using RabbitMQGenerateExcelTutorial.FileCreateWorkerService.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -13,6 +15,11 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
             Uri = new Uri(configSettings["ConnectionStrings:RabbbitMQUrl"]),
             DispatchConsumersAsync = true
+        });
+
+        services.AddDbContext<AdventureWorks2019Context>(options =>
+        {
+            options.UseSqlServer(configSettings["ConnectionStrings:SqlServer"]);
         });
 
         services.AddSingleton<RabbitMQClientService>();
