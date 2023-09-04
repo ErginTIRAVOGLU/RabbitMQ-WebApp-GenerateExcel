@@ -46,8 +46,7 @@ namespace UdemyRabbitMQGenerateExcelTutorial.WebApp.Controllers
 
             _rabbitMQPublisher.Publish(new Shared.CreateExcelMessage()
             {
-                FileId=userFile.Id,
-                UserID=user.Id
+                FileId=userFile.Id
             });
 
             TempData["StartCreatingExcel"] = true;
