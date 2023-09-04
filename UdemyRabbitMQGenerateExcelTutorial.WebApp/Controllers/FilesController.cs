@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using UdemyRabbitMQGenerateExcelTutorial.WebApp.Hubs;
 using UdemyRabbitMQGenerateExcelTutorial.WebApp.Models;
 
 namespace UdemyRabbitMQGenerateExcelTutorial.WebApp.Controllers
@@ -9,12 +11,13 @@ namespace UdemyRabbitMQGenerateExcelTutorial.WebApp.Controllers
     [ApiController]
     public class FilesController : ControllerBase
     {
-
         private readonly AppDbContext _appDbContext;
+        private readonly IHubContext<MyHub> _hubContext;
 
-        public FilesController(AppDbContext appDbContext)
+        public FilesController(AppDbContext appDbContext, IHubContext<MyHub> hubContext)
         {
             _appDbContext = appDbContext;
+            _hubContext = hubContext;
         }
 
         [HttpPost]
@@ -36,7 +39,8 @@ namespace UdemyRabbitMQGenerateExcelTutorial.WebApp.Controllers
             userFile.FileStatus = FileStatus.Completed;
 
             await _appDbContext.SaveChangesAsync();
-            //TODO:SignalR eklenecek
+
+            await _hubContext.Clients.User(userFile.UserId).SendAsync("CompletedFile");
             return Ok();
         }
     }

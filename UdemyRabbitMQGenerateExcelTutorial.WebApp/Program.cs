@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using System.Configuration;
+using UdemyRabbitMQGenerateExcelTutorial.WebApp.Hubs;
 using UdemyRabbitMQGenerateExcelTutorial.WebApp.Models;
 using UdemyRabbitMQGenerateExcelTutorial.WebApp.Services;
 
@@ -34,6 +35,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,6 +54,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<MyHub>("/MyHub");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
