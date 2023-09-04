@@ -37,6 +37,7 @@ namespace RabbitMQGenerateExcelTutorial.FileCreateWorkerService
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
+            _channel.QueueDeclare(RabbitMQClientService.QueueName, true, false, false, null);
             _channel.BasicConsume(RabbitMQClientService.QueueName,false,consumer);
             consumer.Received += Consumer_Received;
 
@@ -59,7 +60,9 @@ namespace RabbitMQGenerateExcelTutorial.FileCreateWorkerService
             MultipartFormDataContent multipartFormDataContent = new();
             multipartFormDataContent.Add(new ByteArrayContent(ms.ToArray()), "file", Guid.NewGuid().ToString() + ".xlsx");
 
-            var baseUrl = "https://localhost:44394/api/files";
+            _logger.LogInformation("File upload öncesi");
+
+            var baseUrl = "https://localhost:7024/api/files";
             using (var httpClient = new HttpClient())
             {
                 var response = await httpClient.PostAsync($"{baseUrl}?fileId={createExcelMessage.FileId}", multipartFormDataContent);
@@ -73,6 +76,8 @@ namespace RabbitMQGenerateExcelTutorial.FileCreateWorkerService
                     _logger.LogError("Dosya gönderilemedi. ");
                 }
             }
+
+            _logger.LogInformation("File upload sonrasý");
         }
 
         private DataTable GetTable(string tableName)
